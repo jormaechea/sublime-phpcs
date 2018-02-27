@@ -612,6 +612,35 @@ class PhpcsCommand():
 
         return self.error_lines[line + 1]
 
+    def get_prev_error(self, line):
+        current_line = line + 1
+        print("current_line")
+        print(current_line)
+
+        cache_error=None
+        # todo: Need a way of getting the line count of the current file!
+        cache_line=0
+        for error in self.report:
+            error_line = error.get_line()
+
+            if cache_error != None:
+                cache_line = cache_error.get_line()
+
+            print("---")
+            print(int(error_line))
+            print(int(current_line))
+            print(int(cache_line))
+            print("---")
+
+            if int(error_line) < int(current_line) and int(error_line) > int(cache_line):
+                cache_error = error
+
+        if cache_error != None:
+            pt = cache_error.get_point()
+            self.view.sel().clear()
+            self.view.sel().add(sublime.Region(pt))
+            self.view.show(pt)
+
     def get_next_error(self, line):
         current_line = line + 1
 
@@ -690,6 +719,22 @@ class PhpcsShowPreviousErrors(PhpcsTextBase):
 
     def is_enabled(self):
         '''This command is only enabled if it's a PHP buffer with previous errors.'''
+        return PhpcsTextBase.should_execute(self.view) \
+            and PhpcsCommand.instance(self.view, False) \
+            and len(PhpcsCommand.instance(self.view, False).error_list) > 0
+
+
+class PhpcsGotoPrevErrorCommand(PhpcsTextBase):
+    """Go to the next error from the current position"""
+    def run(self, args):
+        line = self.view.rowcol(self.view.sel()[0].end())[0]
+
+        cmd = PhpcsCommand.instance(self.view)
+        next_line = cmd.get_prev_error(line)
+
+    def is_enabled(self):
+        '''This command is only enabled if it's a PHP buffer with previous errors.'''
+
         return PhpcsTextBase.should_execute(self.view) \
             and PhpcsCommand.instance(self.view, False) \
             and len(PhpcsCommand.instance(self.view, False).error_list) > 0

@@ -12,6 +12,10 @@
         "command": "phpcs_show_previous_errors"
     },
     {
+        "caption": "PHP Code Sniffer: Goto previous error",
+        "command": "phpcs_goto_prev_error"
+    },
+    {
         "caption": "PHP Code Sniffer: Goto next error",
         "command": "phpcs_goto_next_error"
     },

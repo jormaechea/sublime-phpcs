@@ -30,7 +30,8 @@ class Pref:
         "phpcs_show_quick_panel",
         "phpcs_php_prefix_path",
         "phpcs_commands_to_php_prefix",
-        "phpcs_icon_scope_color",
+        "phpcs_icon_warning_color",
+        "phpcs_icon_error_color",
         "phpcs_sniffer_run",
         "phpcs_command_on_save",
         "phpcs_executable_path",
@@ -108,12 +109,16 @@ def debug_message(msg):
 
 class CheckstyleError():
     """Represents an error that needs to be displayed on the UI for the user"""
-    def __init__(self, line, message):
+    def __init__(self, line, message, severity):
         self.line = line
         self.message = message
+        self.severity = severity
 
     def get_line(self):
         return self.line
+
+    def get_severity(self):
+        return self.severity
 
     def get_message(self):
         data = self.message
@@ -151,7 +156,7 @@ class ShellCommand():
 
     def shell_out(self, cmd):
         data = None
-        
+
         for i, arg in enumerate(cmd):
             if isinstance(arg, str) and arg.startswith('~'):
                 cmd[i] = os.path.expanduser(arg)
@@ -236,7 +241,7 @@ class Sniffer(ShellCommand):
         lines = re.finditer('.*line="(?P<line>\d+)" column="(?P<column>\d+)" severity="(?P<severity>\w+)" message="(?P<message>.*)" source', report)
 
         for line in lines:
-            error = CheckstyleError(line.group('line'), line.group('message'))
+            error = CheckstyleError(line.group('line'), line.group('message'), line.group('severity'))
             self.error_list.append(error)
 
     def get_standards_available(self):
@@ -513,7 +518,10 @@ class PhpcsCommand():
 
     def generate(self):
         self.error_list = []
-        region_set = []
+        region_sets = {
+            "warning": [],
+            "error": []
+        }
         self.error_lines = {}
 
         for shell_command, report, icon in self.checkstyle_reports:
@@ -522,10 +530,11 @@ class PhpcsCommand():
 
             debug_message(shell_command + ' found ' + str(len(report)) + ' errors')
             for error in report:
+
                 line = int(error.get_line())
                 pt = self.view.text_point(line - 1, 0)
                 region_line = self.view.line(pt)
-                region_set.append(region_line)
+                region_sets[error.get_severity()].append(region_line)
                 self.error_list.append('(' + str(line) + ') ' + error.get_message())
                 error.set_point(pt)
                 self.report.append(error)
@@ -533,12 +542,19 @@ class PhpcsCommand():
 
             if len(self.error_list) > 0:
                 icon = icon if pref.phpcs_show_gutter_marks else ''
-                outline = sublime.DRAW_OUTLINED if pref.phpcs_outline_for_errors else sublime.HIDDEN
+                outline = sublime.DRAW_STIPPLED_UNDERLINE | sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE if pref.phpcs_outline_for_errors else sublime.HIDDEN
                 if pref.phpcs_show_gutter_marks or pref.phpcs_outline_for_errors:
-                    if pref.phpcs_icon_scope_color == None:
-                        debug_message("WARN: phpcs_icon_scope_color is not defined, so resorting to phpcs colour scope")
-                        pref.phpcs_icon_scope_color = "phpcs"
-                    self.view.add_regions(shell_command, region_set, pref.phpcs_icon_scope_color, icon, outline)
+
+                    if pref.phpcs_icon_warning_color == None:
+                        debug_message("WARN: phpcs_icon_warning_color is not defined, so resorting to phpcs colour scope")
+                        pref.phpcs_icon_warning_color = "phpcs"
+
+                    if pref.phpcs_icon_error_color == None:
+                        debug_message("WARN: phpcs_icon_error_color is not defined, so resorting to phpcs colour scope")
+                        pref.phpcs_icon_error_color = "phpcs"
+
+                    self.view.add_regions(shell_command + "Warning", region_sets["warning"], pref.phpcs_icon_warning_color, icon, outline)
+                    self.view.add_regions(shell_command + "Error", region_sets["error"], pref.phpcs_icon_error_color, icon, outline)
 
         if pref.phpcs_show_quick_panel == True:
             # Skip showing the errors if we ran on save, and the option isn't set.

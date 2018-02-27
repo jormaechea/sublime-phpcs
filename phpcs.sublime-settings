@@ -49,7 +49,8 @@
     // What color to stylise the icon
     // https://www.sublimetext.com/docs/3/api_reference.html#sublime.View
     // add_regions
-    "phpcs_icon_scope_color": "comment",
+    "phpcs_icon_warning_color": "string",
+    "phpcs_icon_error_color": "keyword",
 
 
     // PHP_CodeSniffer settings

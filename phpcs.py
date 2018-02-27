@@ -614,8 +614,6 @@ class PhpcsCommand():
 
     def get_prev_error(self, line):
         current_line = line + 1
-        print("current_line")
-        print(current_line)
 
         cache_error=None
         # todo: Need a way of getting the line count of the current file!
@@ -625,12 +623,6 @@ class PhpcsCommand():
 
             if cache_error != None:
                 cache_line = cache_error.get_line()
-
-            print("---")
-            print(int(error_line))
-            print(int(current_line))
-            print(int(cache_line))
-            print("---")
 
             if int(error_line) < int(current_line) and int(error_line) > int(cache_line):
                 cache_error = error

@@ -525,8 +525,8 @@ class PhpcsCommand():
         self.error_lines = {}
 
         for shell_command, report, icon in self.checkstyle_reports:
-            self.view.erase_regions('checkstyle')
-            self.view.erase_regions(shell_command)
+            self.view.erase_regions(shell_command + "Warning",)
+            self.view.erase_regions(shell_command + "Error",)
 
             debug_message(shell_command + ' found ' + str(len(report)) + ' errors')
             for error in report:

@@ -27,6 +27,9 @@
     // Show the errors in the status bar
     "phpcs_show_errors_in_status": true,
 
+    // Show the errors in the status bar
+    "phpcs_show_status_bar_counters": true,
+
     // Show the errors in the quick panel so you can then goto line
     "phpcs_show_quick_panel": true,
 

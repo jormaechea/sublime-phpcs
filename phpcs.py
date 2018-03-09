@@ -27,6 +27,7 @@ class Pref:
         "phpcs_show_gutter_marks",
         "phpcs_outline_for_errors",
         "phpcs_show_errors_in_status",
+        "phpcs_show_status_bar_counters",
         "phpcs_show_quick_panel",
         "phpcs_php_prefix_path",
         "phpcs_commands_to_php_prefix",
@@ -522,6 +523,10 @@ class PhpcsCommand():
             "warning": [],
             "error": []
         }
+        self.error_count = {
+            "warning": 0,
+            "error": 0
+        };
         self.error_lines = {}
 
         for shell_command, report, icon in self.checkstyle_reports:
@@ -535,6 +540,7 @@ class PhpcsCommand():
                 pt = self.view.text_point(line - 1, 0)
                 region_line = self.view.line(pt)
                 region_sets[error.get_severity()].append(region_line)
+                self.error_count[error.get_severity()] += 1;
                 self.error_list.append('(' + str(line) + ') ' + error.get_message())
                 error.set_point(pt)
                 self.report.append(error)
@@ -561,6 +567,31 @@ class PhpcsCommand():
             if self.event == 'on_save' and not pref.phpcs_show_errors_on_save:
                 return
             self.show_quick_panel()
+
+        self.set_status_bar_counters()
+
+    def set_status_bar_counters(self):
+        if not pref.phpcs_show_status_bar_counters:
+            return
+
+        if self.view.is_scratch():
+            return
+
+        counter_message = "";
+
+        if self.error_count["warning"] > 0:
+            counter_message += "W: "+ str(self.error_count["warning"])
+
+        if self.error_count["error"] > 0:
+            if(counter_message != ""):
+                counter_message += " ";
+            counter_message += "E: "+ str(self.error_count["error"])
+
+        if counter_message == "":
+            self.view.erase_status('PhpcsCounters')
+        else:
+            counter_message = "[PHPCS: "+ counter_message +"]"
+            self.view.set_status('PhpcsCounters', counter_message)
 
     def show_quick_panel(self):
         self.view.window().show_quick_panel(self.error_list, self.on_quick_panel_done)

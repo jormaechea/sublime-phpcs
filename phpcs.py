@@ -110,7 +110,7 @@ def debug_message(msg):
 
 class CheckstyleError():
     """Represents an error that needs to be displayed on the UI for the user"""
-    def __init__(self, line, message, severity):
+    def __init__(self, line, message, severity='error'):
         self.line = line
         self.message = message
         self.severity = severity

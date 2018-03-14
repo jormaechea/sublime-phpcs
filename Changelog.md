@@ -1,10 +1,25 @@
 CHANGELOG
 =========
 
+6.10.1
+-----
+* Fix Linter marks by setting a default severity to gutter marks
+
+6.10.0
+-----
+* Enhancement for showing warnings and errors totalizers in status bar
+
+6.9.1
+-----
+* Fix for error and warnings not being cleared when a file was 100% fixed
+
+6.9.0
+-----
+* Enhancement for showing warnings and error with different colors
+
 6.8.0
 -----
 * Enhancement for allowing the configuration to use "~" which will be expanded out to your home directory. Thanks to [Quentin Dreyer](https://github.com/qkdreyer) for the [patch](https://github.com/benmatselby/sublime-phpcs/pull/169)
-
 
 6.7.0
 -----

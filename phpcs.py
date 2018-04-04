@@ -22,6 +22,7 @@ class Pref:
         "show_debug",
         "extensions_to_execute",
         "extensions_to_blacklist",
+        "phpcs_execute_on_load",
         "phpcs_execute_on_save",
         "phpcs_show_errors_on_save",
         "phpcs_show_gutter_marks",
@@ -860,6 +861,15 @@ class PhpcsSwitchCodingStandard(PhpcsTextBase):
 
 class PhpcsEventListener(sublime_plugin.EventListener):
     """Event listener for the plugin"""
+
+    def on_load_async(self, view):
+        if PhpcsTextBase.should_execute(view):
+            if pref.phpcs_execute_on_load == True:
+                # print("[Phpcs] on load async")
+                cmd = PhpcsCommand.instance(view)
+                thread = threading.Thread(target=cmd.run, args=(view.file_name(), 'on_load'))
+                thread.start()
+
     def on_post_save(self, view):
         if PhpcsTextBase.should_execute(view):
             if pref.phpcs_execute_on_save == True:

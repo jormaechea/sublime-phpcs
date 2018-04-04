@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.11.0
+-----
+* Enhancement for running the sniffer on file open
+
 6.10.1
 -----
 * Fix Linter marks by setting a default severity to gutter marks

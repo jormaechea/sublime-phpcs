@@ -12,6 +12,9 @@
     // An example would be ["twig.php"]
     "extensions_to_blacklist": [],
 
+    // Execute the sniffer on file load
+    "phpcs_execute_on_load": true,
+
     // Execute the sniffer on file save
     "phpcs_execute_on_save": true,
 

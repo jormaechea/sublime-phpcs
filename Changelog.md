@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+6.12.0
+-----
+* Added commands to go to next/prev error/mark
+
 6.11.0
 -----
 * Enhancement for running the sniffer on file open

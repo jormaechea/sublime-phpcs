@@ -644,7 +644,7 @@ class PhpcsCommand():
 
         return self.error_lines[line + 1]
 
-    def get_prev_error(self, line):
+    def get_prev_error(self, line, severity):
         current_line = line + 1
 
         cache_error=None
@@ -656,7 +656,7 @@ class PhpcsCommand():
             if cache_error != None:
                 cache_line = cache_error.get_line()
 
-            if int(error_line) < int(current_line) and int(error_line) > int(cache_line):
+            if int(error_line) < int(current_line) and int(error_line) > int(cache_line) and (severity == 'all' or error.get_severity() == severity):
                 cache_error = error
 
         if cache_error != None:
@@ -665,19 +665,20 @@ class PhpcsCommand():
             self.view.sel().add(sublime.Region(pt))
             self.view.show(pt)
 
-    def get_next_error(self, line):
+    def get_next_error(self, line, severity):
         current_line = line + 1
 
         cache_error=None
         # todo: Need a way of getting the line count of the current file!
         cache_line=1000000
         for error in self.report:
+
             error_line = error.get_line()
 
             if cache_error != None:
                 cache_line = cache_error.get_line()
 
-            if int(error_line) > int(current_line) and int(error_line) < int(cache_line):
+            if int(error_line) > int(current_line) and int(error_line) < int(cache_line) and (severity == 'all' or error.get_severity() == severity):
                 cache_error = error
 
         if cache_error != None:
@@ -754,7 +755,7 @@ class PhpcsGotoPrevErrorCommand(PhpcsTextBase):
         line = self.view.rowcol(self.view.sel()[0].end())[0]
 
         cmd = PhpcsCommand.instance(self.view)
-        next_line = cmd.get_prev_error(line)
+        next_line = cmd.get_prev_error(line, 'error')
 
     def is_enabled(self):
         '''This command is only enabled if it's a PHP buffer with previous errors.'''
@@ -770,7 +771,38 @@ class PhpcsGotoNextErrorCommand(PhpcsTextBase):
         line = self.view.rowcol(self.view.sel()[0].end())[0]
 
         cmd = PhpcsCommand.instance(self.view)
-        next_line = cmd.get_next_error(line)
+        next_line = cmd.get_next_error(line, 'error')
+
+    def is_enabled(self):
+        '''This command is only enabled if it's a PHP buffer with previous errors.'''
+
+        return PhpcsTextBase.should_execute(self.view) \
+            and PhpcsCommand.instance(self.view, False) \
+            and len(PhpcsCommand.instance(self.view, False).error_list) > 0
+
+class PhpcsGotoPrevMarkCommand(PhpcsTextBase):
+    """Go to the next error from the current position"""
+    def run(self, args):
+        line = self.view.rowcol(self.view.sel()[0].end())[0]
+
+        cmd = PhpcsCommand.instance(self.view)
+        next_line = cmd.get_prev_error(line, 'all')
+
+    def is_enabled(self):
+        '''This command is only enabled if it's a PHP buffer with previous errors.'''
+
+        return PhpcsTextBase.should_execute(self.view) \
+            and PhpcsCommand.instance(self.view, False) \
+            and len(PhpcsCommand.instance(self.view, False).error_list) > 0
+
+
+class PhpcsGotoNextMarkCommand(PhpcsTextBase):
+    """Go to the next error from the current position"""
+    def run(self, args):
+        line = self.view.rowcol(self.view.sel()[0].end())[0]
+
+        cmd = PhpcsCommand.instance(self.view)
+        next_line = cmd.get_next_error(line, 'all')
 
     def is_enabled(self):
         '''This command is only enabled if it's a PHP buffer with previous errors.'''

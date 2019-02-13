@@ -16,8 +16,16 @@
         "command": "phpcs_goto_prev_error"
     },
     {
+        "caption": "PHP Code Sniffer: Goto previous mark",
+        "command": "phpcs_goto_prev_mark"
+    },
+    {
         "caption": "PHP Code Sniffer: Goto next error",
         "command": "phpcs_goto_next_error"
+    },
+    {
+        "caption": "PHP Code Sniffer: Goto next mark",
+        "command": "phpcs_goto_next_mark"
     },
     {
         "caption": "PHP Coding Standards Fixer: Fix this file (PHP Code Beautifier)",

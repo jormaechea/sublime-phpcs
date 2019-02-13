@@ -46,7 +46,10 @@ The following is a list of commands that you can bind to a keyboard shortcut:
 
 * phpcs_fix_this_file
 * phpcs_clear_sniffer_marks
+* phpcs_goto_prev_error
+* phpcs_goto_prev_mark
 * phpcs_goto_next_error
+* phpcs_goto_next_mark
 * phpcs_show_previous_errors
 * phpcs_sniff_this_file
 
